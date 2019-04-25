@@ -118,7 +118,7 @@ export default class App extends Component<Props> {
     );
   }
 }
-
+// #f9b89c peach matte
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,

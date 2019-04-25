@@ -26,15 +26,18 @@ const { width, height } = Dimensions.get("window");
 export default class App extends Component {
   constructor(props) {
     super(props);
-
     this.state = { getting_Started: 0 };
   }
   componentDidMount = () => {
     retrieveData("getting_Started", (result, error) => {
       if (result) {
+        console.log('hello ' + result);
         this.setState({ getting_Started: 2 });
       } else {
-        this.setState({ getting_Started: 1 });
+        console.log('AAh ' + this.state.getting_Started)
+        setTimeout(() => {
+          this.setState({ getting_Started: 1 });
+        }, 3000)
       }
     });
   };
@@ -57,6 +60,7 @@ export default class App extends Component {
     );
   }
 }
+// #f9b89c == matte peach
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -90,7 +94,7 @@ const retrieveData = (key, callBack) => {
       console.log(error);
       callBack(null, error);
     } else {
-      console.log(result);
+      console.log("wee result: " + result);
       callBack(result, null);
     }
   });

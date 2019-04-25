@@ -25,7 +25,6 @@ const icon = require("../images/logo.png");
 const loaderimage = require("../images/loaderImage.png");
 const unhealthyimage = require("../images/unhealthyimage.png");
 const healthyimage = require("../images/healthyimage.png");
-const scnnerImage = require("../images/scnnerImage.png");
 
 const { width, height } = Dimensions.get("window");
 const FONT_NAME = "AvenirNext-Regular";
@@ -50,6 +49,9 @@ export default class App extends Component {
   }
 
   renderLoader() {
+    // CALCULATING PAGE
+    console.log("got something!" + this.state.barcode)
+    console.log('RENDERLOADER')
     return (
       <View style={styles.mainContainer}>
         <Text style={styles.textContentAreaTitle}>{this.state.barcode}</Text>
@@ -69,9 +71,12 @@ export default class App extends Component {
       return this.renderLoader();
     }
     if (this.state.result) {
-      return this.renderResult();
+      return this.renderResult(); 
     }
-    return (
+    console.log('INITIAL SCREEN')
+    return ( 
+      // Before TAKE A PHOTO SCREEN
+
       <View style={styles.mainContainer}>
         <View style={styles.sliderItemContainer}>
           <Image
@@ -82,7 +87,7 @@ export default class App extends Component {
           <Text style={styles.textContentAreaTitle}>
             Take a photo and choose a photo of ingredients
           </Text>
-        </View>
+        </View> 
         <Button
           buttonStyle={{ marginTop: 8 }}
           onPress={() => {
@@ -115,8 +120,38 @@ export default class App extends Component {
     );
   }
 
+  // render() {
+  //   const { loading, showCamera } = this.state;
+  //   // console.log('====state====', this.state);
+  //   if (loading) {
+  //     return this.renderLoader();
+  //   }
+  //   // if (result) {
+  //   //   return this.renderResult();
+  //   // }
+  //   return (
+  //     <View style={styles.mainContainer}>
+  //       <Modal
+  //         animationType="slide"
+  //         transparent={false}
+  //         visible={showCamera}
+  //         onRequestClose={() => {
+  //           // Alert.alert('Modal has been closed.');
+  //         }}
+  //       >
+  //         {this.renderCamera()}
+  //       </Modal>
+  //     </View>
+  //   );
+  // }
+
   renderResult() {
-    let { healthy, message } = this.state.result;
+    // RESULT PAGE (tells if this item is beneficial or not)
+    // let { healthy, message } = this.state.result; //gotten from some outside source
+    console.log('RESULT SCREEN')
+    let { result } = this.state;
+    let { healthy, message, ingredients } = result;
+
 
     let mainstyle = {
       ...styles.mainContainer,
@@ -134,6 +169,12 @@ export default class App extends Component {
             resizeMode="contain"
           />
           <Text style={textstyle}>{message}</Text>
+          {/* <Text style={[textstyle, { textAlign: 'left' }]}>
+            <Text style={[textstyle, { fontWeight: '600' }]}>
+              Ingredients:&nbsp;
+            </Text>
+            {ingredients}
+          </Text> */}
         </View>
         <Button
           buttonStyle={{ marginTop: 8 }}
@@ -142,7 +183,7 @@ export default class App extends Component {
           }}
           rounded
           large
-          backgroundColor={!healthy ? "#85bf43" : "#eb8c30"}
+          backgroundColor={!healthy ? "#85bf43" : "#eb8c30"} // green, or red
           title="Check Another Product"
           textStyle={{
             fontSize: 16,
@@ -155,21 +196,41 @@ export default class App extends Component {
     );
   }
 
+  onCancelCamera = () => {
+    console.log('CANCEL CAMERA')
+    const { navigation } = this.props;
+    this.setState({ showCamera: false });
+    navigation.goBack();
+  };
+
+  checkAnotherProduct = () => {
+    console.log('CHECKANOTHERPRODUCT')
+    const { navigation } = this.props;
+    this.setState({ showCamera: false, loading: false, result: null });
+    navigation.goBack();
+  };
+
   renderCamera() {
     return (
+      // TAKE A PHOTO SCREEN
       <View style={styles.container}>
         <RNCamera
           ref={ref => {
             this.camera = ref;
           }}
+          barcodeFinderWidth={width * 0.926}
+          barcodeFinderHeight={width * 0.618}
+          barcodeFinderVisible
+          barcodeFinderBorderColor="red"
+          barcodeFinderBorderWidth={3}
+
           style={styles.preview}
           type={RNCamera.Constants.Type.back}
-          flashMode={RNCamera.Constants.FlashMode.on}
+          flashMode={RNCamera.Constants.FlashMode.on}       
           permissionDialogTitle={"Permission to use camera"}
-          permissionDialogMessage={
-            "We need your permission to use your camera phone"
-          }
+          permissionDialogMessage={"We need your permission to use your camera phone"}
           onBarCodeRead={barcodes => {
+            console.log('BARCODES ');
             console.log(barcodes);
             if (this.state.showCamera) {
               this.setState(
@@ -181,75 +242,25 @@ export default class App extends Component {
             }
           }}
           onGoogleVisionBarcodesDetected={({ barcodes }) => {
-            console.log(barcodes);
+            console.log('Barcodes Detected!:', barcodes);
           }}
         />
 
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0
-          }}
-        >
-          <View
-            style={{
-              flex: 1,
-              alignSelf: "stretch",
-              backgroundColor: "#000",
-              opacity: 0.5
-            }}
-          />
+        <View style={styles.style1}>
+          <View style={styles.style2} />
           <View style={{ flex: 1, alignSelf: "stretch" }} />
 
-          <View
-            style={{
-              flex: 1,
-              alignSelf: "stretch",
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              paddingBottom: 32,
-              flexDirection: "column",
-              backgroundColor: "rgba(0,0,0,0.5)"
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 24,
-                fontWeight: "normal",
-                fontFamily: FONT_NAME,
-                color: "white",
-                marginBottom: 20
-              }}
-            >
-              {this.state.barcode ? "Barcode Detected" : "Scan Barcode"}
+          <View style={styles.style3}>
+            <Text style={styles.style4}>
+              {this.state.barcode ? "Barcode Detected" : "Position Barcode Here"}
             </Text>
             {this.state.barcode.length > 0 && (
-              <Text
-                style={{
-                  fontSize: 20,
-                  color: "white",
-                  margin: 8,
-                  marginBottom: 16,
-                  fontWeight: "bold"
-                }}
-              >
+              <Text style={styles.style5}>
                 {this.state.barcode}
               </Text>
             )}
 
-            <View
-              style={{
-                flex: 0,
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingBottom: 8
-              }}
-            >
+            <View style={styles.style6}>
               {this.state.barcode.length > 0 && (
                 <Button
                   onPress={() => {
@@ -270,9 +281,10 @@ export default class App extends Component {
               )}
 
               <Button
-                onPress={() => {
-                  this.setState({ showCamera: false });
-                }}
+                // onPress={() => {
+                //   this.setState({ showCamera: false });
+                // }}
+                onPress={this.onCancelCamera}
                 rounded
                 large
                 title="CANCEL"
@@ -291,6 +303,7 @@ export default class App extends Component {
   }
 
   fetchData = () => {
+    console.log('FETCHDATA')
     this.setState({ loading: true });
     this.fetchIngredeants((food, error) => {
       if (food) {
@@ -317,12 +330,15 @@ export default class App extends Component {
   };
 
   fetchIngredeants = fnc => {
+    let { barcode } = this.state;
     let url = `https://api.edamam.com/api/food-database/parser`;
+    console.log('FETCHINGREDIENTS')
+    console.log(fnc)
     GET(
       url,
       {},
       {
-        upc: this.state.barcode,
+        upc: barcode,
         app_id: "c7547c4f",
         app_key: "f799a9b249c3a96f17d715a58a31cac9"
       },
@@ -332,7 +348,7 @@ export default class App extends Component {
           if (hints && hints.length > 0) {
             let hint = hints[0];
             let { food } = hint;
-            let { label, foodContentsLabel } = food;
+            let { label, foodContentsLabel } = food; // seems unncessary
             fnc(food, error);
           } else {
             //console.log(`Error ${response}`);
@@ -344,8 +360,12 @@ export default class App extends Component {
       }
     );
   };
+
   fetchResult = (ingredients, fnc) => {
     let url = `http://13.232.170.63/ing_app/public/api/v1/ingredients`;
+    console.log('FETCHRESULT')
+
+    console.log(fnc)
     GET(
       url,
       {},
@@ -374,6 +394,50 @@ export default class App extends Component {
 }
 
 const styles = StyleSheet.create({
+  style1: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0
+  },
+  style2: {
+      flex: 1,
+      alignSelf: "stretch",
+      backgroundColor: "#000",
+      opacity: 0.5
+  },
+  style3: {
+      flex: 1,
+      alignSelf: "stretch",
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      paddingBottom: 32,
+      flexDirection: "column",
+      backgroundColor: "rgba(0,0,0,0.5)"
+  },
+  style4: {
+      fontSize: 24,
+      fontWeight: "normal",
+      fontFamily: FONT_NAME,
+      color: "white",
+      marginBottom: 20
+  },
+  style5: {
+      fontSize: 20,
+      color: "white",
+      margin: 8,
+      marginBottom: 16,
+      fontWeight: "bold"
+  },
+  style6: {
+      flex: 0,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      paddingBottom: 8
+  },
   mainContainer: {
     flex: 1,
     flexDirection: "column",
@@ -433,7 +497,7 @@ const REQUEST = (method, url, headers, params, callback, isJSON) => {
   };
 
   let body = "";
-
+  console.log('REQUEST Params:' )
   console.log(params);
 
   Object.keys(params).forEach(function(key) {

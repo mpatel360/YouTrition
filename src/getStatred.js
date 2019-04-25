@@ -5,7 +5,7 @@
  * @format
  * @flow
  */
-
+// POST-SCREEN-SPLASH (Let's do this)
 import React, { Component } from "react";
 import {
   AppRegistry,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "white",
+    backgroundColor: "#ffdab9",
     justifyContent: "center",
     alignItems: "center",
     padding: 8
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   sliderItemContainer: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
+    backgroundColor: "#ffdab9",
     flexDirection: "column"
   },
   textContentAreaTitle: {
